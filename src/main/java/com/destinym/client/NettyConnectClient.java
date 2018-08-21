@@ -1,4 +1,4 @@
-package destinym.client;
+package com.destinym.client;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
@@ -50,9 +50,18 @@ public class NettyConnectClient {
 
     public static void main(String[] args) throws Exception {
         String host = "127.0.0.1";
-        int port = 8080;
+        int port = 8081;
+        int connectNum = 0;
+        if (args.length > 2) {
+            host = args[0];
+            port = Integer.parseInt(args[1]);
+            connectNum = Integer.parseInt(args[2]);
+        } else if (args.length == 1) {
+            host = args[0];
+        }
+
         EventLoopGroup workerGroup = new NioEventLoopGroup();
-        for (int i = 0; i < 2000; i++) {
+        for (int i = 0; i < connectNum; i++) {
             NettyConnectClient nettyConnectClient = new NettyConnectClient(host, port, workerGroup);
             nettyConnectClient.connect();
             System.out.println("aaa"+ i);

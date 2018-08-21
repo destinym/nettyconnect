@@ -1,4 +1,4 @@
-package destinym.server;
+package com.destinym.server;
 
 
 import io.netty.bootstrap.ServerBootstrap;
@@ -59,7 +59,7 @@ public class NettyConnectServer {
         if (args.length > 0) {
             port = Integer.parseInt(args[0]);
         } else {
-            port = 8080;
+            port = 8081;
         }
         new NettyConnectServer(port).run();
     }

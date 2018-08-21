@@ -1,4 +1,4 @@
-package destinym.server;
+package com.destinym.server;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
