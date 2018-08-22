@@ -21,8 +21,16 @@ jar {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
     manifest {
-        attributes 'Main-Class': 'com.destinym.server.NettyConnectServer'
+        attributes 'Main-Class': 'com.destinym.count.server.NettyConnectServer'
     }
 }
 
 
+//jar {
+//    from {
+//        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+//    }
+//    manifest {
+//        attributes 'Main-Class': 'com.destinym.count.client.NettyConnectClient'
+//    }
+//}

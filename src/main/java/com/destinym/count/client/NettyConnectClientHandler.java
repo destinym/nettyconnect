@@ -1,4 +1,4 @@
-package com.destinym.client;
+package com.destinym.count.client;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;

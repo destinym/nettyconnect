@@ -1,4 +1,4 @@
-package com.destinym.client;
+package com.destinym.count.client;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
@@ -64,7 +64,7 @@ public class NettyConnectClient {
         for (int i = 0; i < connectNum; i++) {
             NettyConnectClient nettyConnectClient = new NettyConnectClient(host, port, workerGroup);
             nettyConnectClient.connect();
-            System.out.println("aaa"+ i);
+            System.out.println(i + "client start");
         }
 
     }

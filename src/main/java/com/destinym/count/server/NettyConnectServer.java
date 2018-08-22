@@ -1,4 +1,4 @@
-package com.destinym.server;
+package com.destinym.count.server;
 
 
 import io.netty.bootstrap.ServerBootstrap;
