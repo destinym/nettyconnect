@@ -50,5 +50,5 @@ public class NettyConnectServerHandler extends ChannelInboundHandlerAdapter {
 ```
 
 ### git地址
-git@github.com:destinym/nettyconnect.git    
+[https://github.com/destinym/nettyconnect.git](https://github.com/destinym/nettyconnect.git)
 count模块

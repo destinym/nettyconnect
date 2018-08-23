@@ -1,4 +1,4 @@
-package com.destinym.count.server;
+package com.destinym.heartbeat.server;
 
 
 import io.netty.bootstrap.ServerBootstrap;
@@ -9,18 +9,22 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Discards any incoming data.
  */
-public class NettyConnectServer {
-
+public class NettyHeartBeatServer {
     private int port;
     private AtomicInteger connectNum;
+    private static final int READ_IDEL_TIME_OUT = 25; // 读超时
+    private static final int WRITE_IDEL_TIME_OUT = 25;// 写超时
+    private static final int ALL_IDEL_TIME_OUT = 30; // 所有超时
 
-    public NettyConnectServer(int port) {
+    public NettyHeartBeatServer(int port) {
         this.port = port;
         connectNum = new AtomicInteger(0);
     }
@@ -35,7 +39,10 @@ public class NettyConnectServer {
                     .childHandler(new ChannelInitializer<SocketChannel>() { // (4)
                         @Override
                         public void initChannel(SocketChannel ch) {
-                            ch.pipeline().addLast(new NettyConnectServerHandler(connectNum));
+                            ch.pipeline().addLast(new NettyHeartBeatServerHandler(connectNum));
+                            ch.pipeline().addLast(new IdleStateHandler(READ_IDEL_TIME_OUT,
+                                    WRITE_IDEL_TIME_OUT, ALL_IDEL_TIME_OUT, TimeUnit.SECONDS));
+                            ch.pipeline().addLast(new HeartbeatServerHandler()); // 2
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)          // (5)
@@ -64,6 +71,6 @@ public class NettyConnectServer {
         } else {
             port = 8081;
         }
-        new NettyConnectServer(port).run();
+        new NettyHeartBeatServer(port).run();
     }
 }
