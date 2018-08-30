@@ -1,25 +1,30 @@
 package com.destinym.heartbeat.client;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
-public class NettyConnectClient {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import static java.lang.Thread.sleep;
+
+public class HeartBeatClient {
     private EventLoopGroup workerGroup;
     private Bootstrap bootstrap;
     private String host;
     private int port;
+    private CopyOnWriteArrayList<Channel> channelList;
 
-    public NettyConnectClient(String host, int port, EventLoopGroup workerGroup) {
+
+    public HeartBeatClient(String host, int port, EventLoopGroup workerGroup, CopyOnWriteArrayList<Channel> channelList) {
         this.host = host;
         this.port = port;
         this.workerGroup = workerGroup;
-
+        this.channelList = channelList;
         bootstrap = new Bootstrap();
     }
 
@@ -31,12 +36,13 @@ public class NettyConnectClient {
             bootstrap.handler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
-                    ch.pipeline().addLast(new NettyConnectClientHandler());
+                    ch.pipeline().addLast(new ClientHandler(channelList));
                 }
             });
 
             // Start the client.
             ChannelFuture f = bootstrap.connect(host, port).sync(); // (5)
+            channelList.add(f.channel());
 
             // Wait until the connection is closed.
             //f.channel().closeFuture().sync();
@@ -59,13 +65,19 @@ public class NettyConnectClient {
         } else if (args.length == 1) {
             host = args[0];
         }
-
+        CopyOnWriteArrayList<Channel> channelList = new CopyOnWriteArrayList<>();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         for (int i = 0; i < connectNum; i++) {
-            NettyConnectClient nettyConnectClient = new NettyConnectClient(host, port, workerGroup);
-            nettyConnectClient.connect();
+            HeartBeatClient heartBeatClient = new HeartBeatClient(host, port, workerGroup, channelList);
+            heartBeatClient.connect();
             System.out.println(i + "client start");
         }
+
+        while (channelList.size() > 0) {
+            System.out.println("current channel: " + channelList);
+            sleep(10000);
+        }
+        workerGroup.shutdownGracefully();
 
     }
 }

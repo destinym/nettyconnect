@@ -1,9 +1,19 @@
 package com.destinym.heartbeat.client;
 
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
-public class NettyConnectClientHandler extends ChannelInboundHandlerAdapter {
+import java.util.List;
+
+public class ClientHandler extends ChannelInboundHandlerAdapter {
+    private List<Channel> channelList;
+
+    public ClientHandler(List<Channel> channelList) {
+        this.channelList = channelList;
+    }
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
 //        ByteBuf m = (ByteBuf) msg; // (1)
@@ -21,4 +31,14 @@ public class NettyConnectClientHandler extends ChannelInboundHandlerAdapter {
         cause.printStackTrace();
         ctx.close();
     }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("channel inactive:  " + ctx);
+        super.channelInactive(ctx);
+        ctx.close();
+        channelList.remove(ctx.channel());
+    }
+
+
 }

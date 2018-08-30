@@ -1,4 +1,4 @@
-package com.destinym.count.server;
+package com.destinym.heartbeat.server;
 
 
 import io.netty.bootstrap.ServerBootstrap;
@@ -9,19 +9,23 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Discards any incoming data.
  */
-public class NettyConnectServer {
-
+public class HeartBeatServer {
     private int port;
     private AtomicInteger connectNum;
+    private int heartCheckInterval = 30; // 所有超时
 
-    public NettyConnectServer(int port) {
+    public HeartBeatServer(int port, int heartCheckInterval) {
         this.port = port;
+        this.heartCheckInterval = heartCheckInterval;
+
         connectNum = new AtomicInteger(0);
     }
 
@@ -35,7 +39,10 @@ public class NettyConnectServer {
                     .childHandler(new ChannelInitializer<SocketChannel>() { // (4)
                         @Override
                         public void initChannel(SocketChannel ch) {
-                            ch.pipeline().addLast(new NettyConnectServerHandler(connectNum));
+                            ch.pipeline().addLast(new ConnectHandler(connectNum));
+                            ch.pipeline().addLast(new IdleStateHandler(0,
+                                    0, heartCheckInterval, TimeUnit.SECONDS));
+                            ch.pipeline().addLast(new HeartbeatServerHandler()); // 2
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)          // (5)
@@ -59,11 +66,13 @@ public class NettyConnectServer {
 
     public static void main(String[] args) throws Exception {
         int port;
+        int heartCheckInterval = 30;
         if (args.length > 0) {
             port = Integer.parseInt(args[0]);
+            heartCheckInterval = Integer.parseInt(args[1]);
         } else {
             port = 8081;
         }
-        new NettyConnectServer(port).run();
+        new HeartBeatServer(port, heartCheckInterval).run();
     }
 }

@@ -34,11 +34,17 @@ public class HeartbeatServerHandler extends ChannelInboundHandlerAdapter {
             } else if (event.state() == IdleState.ALL_IDLE) {
                 type = "all idle";
             }
+            loss_connect_time++;
 
-            ctx.writeAndFlush(HEARTBEAT_SEQUENCE.duplicate()).addListener(
-                    ChannelFutureListener.CLOSE_ON_FAILURE);  // 3
+//            ctx.writeAndFlush(HEARTBEAT_SEQUENCE.duplicate()).addListener(
+//                    ChannelFutureListener.CLOSE_ON_FAILURE);  // 3
 
-            System.out.println( ctx.channel().remoteAddress()+"超时类型：" + type);
+            System.out.println(ctx.channel().remoteAddress() + "超时类型：" + type);
+
+            if (loss_connect_time >= 2) {
+                ctx.close();
+                System.out.println("ctx close" + ctx);
+            }
 
         } else {
             super.userEventTriggered(ctx, evt);

@@ -7,10 +7,10 @@ import io.netty.util.ReferenceCountUtil;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class NettyHeartBeatServerHandler extends ChannelInboundHandlerAdapter {
+public class ConnectHandler extends ChannelInboundHandlerAdapter {
     private AtomicInteger connectNum;
 
-    public NettyHeartBeatServerHandler(AtomicInteger connectNum) {
+    public ConnectHandler(AtomicInteger connectNum) {
         this.connectNum = connectNum;
     }
 
